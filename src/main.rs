@@ -1,12 +1,17 @@
 use std::io::{Error, Read, Write};
-use std::net::{TcpListener, TcpStream};
+use std::net::{TcpListener, TcpStream, Shutdown};
 use std::str::from_utf8;
 use std::net::ToSocketAddrs;
 
 fn main() {
+    //command argument
+    let args: Vec<String> = std::env::args().collect();
+    println!("{} {}", &args[1], &args[2]);
     let mut target_address = "192.168.30.40";
     let mut target_port = "4352";
-    
+    let command = &args[1];
+    let transmission_parameters = &args[2];
+
     match TcpStream::connect("192.168.30.40:4352") {
         Ok(mut stream) => {
             println!("Successfully connected to server");
@@ -16,7 +21,7 @@ fn main() {
             stream.read_exact(&mut data);
             let negotiation = from_utf8(&data).unwrap();
             println!("{}", negotiation);
-            send_command(stream, "INPT", "31");
+            send_command(stream, command, transmission_parameters);
             //stream.write(msg).unwrap();
             //stream.read_exact(&mut data);
             //let result = from_utf8(&data).unwrap();
