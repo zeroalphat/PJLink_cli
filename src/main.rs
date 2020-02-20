@@ -2,30 +2,38 @@ use std::io::{Error, Read, Write};
 use std::net::{TcpListener, TcpStream, Shutdown};
 use std::str::from_utf8;
 use std::net::ToSocketAddrs;
+use structopt::{clap, StructOpt};
+
+#[derive(StructOpt, Debug)]
+#[structopt(name = "joseph")]
+#[structopt(setting(clap::AppSettings::ColoredHelp))]
+struct Opt {
+    #[structopt(name = "CMD")]
+    command: String,
+
+    #[structopt(name = "parrameter")]
+    transmission: String,
+}
+
 
 fn main() {
     //command argument
-    let args: Vec<String> = std::env::args().collect();
-    println!("{} {}", &args[1], &args[2]);
-    let mut target_address = "192.168.30.40";
-    let mut target_port = "4352";
-    let command = &args[1];
-    let transmission_parameters = &args[2];
+    let opt = Opt::from_args();
+    //println!("{:#?}", &opt);
+    
+    let command = &opt.command;
+    let transmission_parameters = &opt.transmission;
+    println!("{} {}", command, transmission_parameters);
 
     match TcpStream::connect("192.168.30.40:4352") {
         Ok(mut stream) => {
             println!("Successfully connected to server");
-            let msg = b"%1POWR 1\r";
             let mut data = [0 as u8; 9];
             
             stream.read_exact(&mut data);
             let negotiation = from_utf8(&data).unwrap();
             println!("{}", negotiation);
             send_command(stream, command, transmission_parameters);
-            //stream.write(msg).unwrap();
-            //stream.read_exact(&mut data);
-            //let result = from_utf8(&data).unwrap();
-            //println!("{}", result);
         },
         Err(e) => {
             println!("Failed to connect: {}", e);
