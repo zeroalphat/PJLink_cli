@@ -1,4 +1,4 @@
-# jplink_cli
+# PJLink_cli
 
 ## installation
 
